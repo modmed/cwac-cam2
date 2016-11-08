@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.crypto.CipherOutputStream;
 import de.greenrobot.event.EventBus;
 
 /**
@@ -94,11 +95,12 @@ public class JPEGWriter extends AbstractImageProcessor {
           f.getParentFile().mkdirs();
 
           FileOutputStream fos=new FileOutputStream(f);
+          CipherOutputStream cos = new CipherOutputStream(fos, AESCipher.getCipher());
 
-          fos.write(jpeg);
-          fos.flush();
-          fos.getFD().sync();
-          fos.close();
+          cos.write(jpeg);
+          cos.flush();
+//          fos.getFD().sync();
+          cos.close();
 
           if (updateMediaStore) {
             MediaScannerConnection.scanFile(imageContext.getContext(),
