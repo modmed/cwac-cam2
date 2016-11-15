@@ -101,6 +101,7 @@ public class JPEGWriter extends AbstractImageProcessor {
           cos.flush();
 //          fos.getFD().sync();
           cos.close();
+          fos.close();
 
           if (updateMediaStore) {
             MediaScannerConnection.scanFile(imageContext.getContext(),
