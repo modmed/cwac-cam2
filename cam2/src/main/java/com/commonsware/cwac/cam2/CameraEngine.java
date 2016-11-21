@@ -181,6 +181,13 @@ abstract public class CameraEngine {
   }
 
   /**
+   * Image is taken, but not yet saved. Display a progress dialog in
+   * CameraActivity since we are encrypting image before writing to disk.
+   */
+  public static class PictureSaveShowProgressEvent {
+  }
+
+  /**
    * Event raised when picture is taken, as a result of a
    * takePicture() call. May include an exception if there was
    * an exception accessing the camera.

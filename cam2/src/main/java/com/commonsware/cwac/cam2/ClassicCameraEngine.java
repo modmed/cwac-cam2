@@ -480,6 +480,7 @@ public class ClassicCameraEngine extends CameraEngine
         @Override
         public void run() {
           camera.startPreview();
+          getBus().post(new PictureSaveShowProgressEvent());
           getBus().post(new PictureTakenEvent(xact,
             xact.process(new ImageContext(ctxt, bytes))));
         }

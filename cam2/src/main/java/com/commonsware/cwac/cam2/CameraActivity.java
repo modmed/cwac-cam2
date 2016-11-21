@@ -15,10 +15,14 @@
 package com.commonsware.cwac.cam2;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.MediaStore;
+
+import com.commonsware.cwac.cam2.R;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +77,7 @@ public class CameraActivity extends AbstractCameraActivity
   private ConfirmationFragment confirmFrag;
   private boolean needsThumbnail=false;
   private boolean isDestroyed=false;
+  private ProgressDialog mProgressDialog;
 
   @Override
   protected void onDestroy() {
@@ -113,10 +118,17 @@ public class CameraActivity extends AbstractCameraActivity
           .show(cameraFrag)
           .commit();
     }
+
+    // Create Progress Dialog to display while decrypting images.
+    mProgressDialog = new ProgressDialog(this);
+    mProgressDialog.setTitle(getResources().getString(R.string.dialog_title_please_wait));
+    mProgressDialog.setMessage(getResources().getString(R.string.dialog_message_saving_image));
+    mProgressDialog.setCancelable(false);
   }
 
   @SuppressWarnings("unused")
   public void onEventMainThread(CameraEngine.PictureTakenEvent event) {
+    mProgressDialog.dismiss();
     if (event.exception==null) {
       if (getIntent().getBooleanExtra(EXTRA_CONFIRM, true)) {
         confirmFrag.setImage(event.getImageContext(),
@@ -135,6 +147,10 @@ public class CameraActivity extends AbstractCameraActivity
     else {
       finish();
     }
+  }
+
+  public void onEventMainThread(CameraEngine.PictureSaveShowProgressEvent event) {
+    mProgressDialog.show(); // Display progress dialog while image is being encrypted.
   }
 
   @Override
