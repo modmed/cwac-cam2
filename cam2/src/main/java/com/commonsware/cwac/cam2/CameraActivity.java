@@ -23,6 +23,9 @@ import android.provider.MediaStore;
 
 import com.commonsware.cwac.cam2.R;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -127,6 +130,7 @@ public class CameraActivity extends AbstractCameraActivity
   }
 
   @SuppressWarnings("unused")
+  @Subscribe(threadMode =ThreadMode.MAIN)
   public void onEventMainThread(CameraEngine.PictureTakenEvent event) {
     mProgressDialog.dismiss();
     if (event.exception==null) {
