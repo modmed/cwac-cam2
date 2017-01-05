@@ -906,7 +906,6 @@ public class CameraTwoEngine extends CameraEngine {
       buffer.get(bytes);
       image.close();
 
-      bus.post(new PictureSaveShowProgressEvent());
       bus.post(new PictureTakenEvent(xact,
         xact.process(new ImageContext(ctxt, bytes))));
     }

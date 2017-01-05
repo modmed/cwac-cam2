@@ -21,7 +21,7 @@
   <application>
     <activity android:name="CameraActivity"/>
     <activity android:name="VideoRecorderActivity"/>
-    <service android:name="CipherInterfaceService" />
+    <service android:name="CipherService" />
   </application>
 
 </manifest>

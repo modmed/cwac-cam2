@@ -167,6 +167,7 @@ abstract public class CameraEngine {
     }
 
     public PictureTakenEvent(Exception exception) {
+
       super(exception);
     }
 
@@ -177,13 +178,6 @@ abstract public class CameraEngine {
     public PictureTransaction getPictureTransaction() {
       return(xact);
     }
-  }
-
-  /**
-   * Image is taken, but not yet saved. Display a progress dialog in
-   * CameraActivity since we are encrypting image before writing to disk.
-   */
-  public static class PictureSaveShowProgressEvent {
   }
 
   /**

@@ -25,6 +25,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -468,9 +469,20 @@ public class CameraFragment extends Fragment {
           false));
     }
 
+    // Show progress dialog while encrypting & saving image.
+    showUserNotification();
+
     fabPicture.setEnabled(false);
     fabSwitch.setEnabled(false);
     ctlr.takePicture(b.build());
+  }
+
+  private void showUserNotification() {
+    ProgressDialog progressDialog = new ProgressDialog(getActivity());
+    progressDialog.setTitle(getResources().getString(R.string.dialog_title_please_wait));
+    progressDialog.setMessage(getResources().getString(R.string.dialog_message_saving_image));
+    progressDialog.setCancelable(false);
+    progressDialog.show();
   }
 
   private void recordVideo() {
