@@ -53,7 +53,8 @@ import java.util.LinkedList;
  * Fragment for displaying a camera preview, with hooks to allow
  * you (or the user) to take a picture.
  */
-public class CameraFragment extends Fragment {
+public class CameraFragment extends Fragment
+  implements ReverseChronometer.Listener {
   private static final String ARG_OUTPUT="output";
   private static final String ARG_UPDATE_MEDIA_STORE=
     "updateMediaStore";
@@ -67,6 +68,8 @@ public class CameraFragment extends Fragment {
   private static final String ARG_FACING_EXACT_MATCH=
     "facingExactMatch";
   private static final String ARG_CHRONOTYPE="chronotype";
+  private static final String ARG_RULE_OF_THIRDS="ruleOfThirds";
+  private static final String ARG_TIMER_DURATION="timerDuration";
   private static final int PINCH_ZOOM_DELTA=20;
   private CameraController ctlr;
   private ViewGroup previewStack;
@@ -86,7 +89,9 @@ public class CameraFragment extends Fragment {
                                                   int quality,
                                                   ZoomStyle zoomStyle,
                                                   boolean facingExactMatch,
-                                                  boolean skipOrientationNormalization) {
+                                                  boolean skipOrientationNormalization,
+                                                  int timerDuration,
+                                                  boolean ruleOfThirds) {
     CameraFragment f=new CameraFragment();
     Bundle args=new Bundle();
 
@@ -98,6 +103,8 @@ public class CameraFragment extends Fragment {
     args.putBoolean(ARG_IS_VIDEO, false);
     args.putSerializable(ARG_ZOOM_STYLE, zoomStyle);
     args.putBoolean(ARG_FACING_EXACT_MATCH, facingExactMatch);
+    args.putInt(ARG_TIMER_DURATION, timerDuration);
+    args.putBoolean(ARG_RULE_OF_THIRDS, ruleOfThirds);
     f.setArguments(args);
 
     return (f);
@@ -110,7 +117,8 @@ public class CameraFragment extends Fragment {
                                                 int durationLimit,
                                                 ZoomStyle zoomStyle,
                                                 boolean facingExactMatch,
-                                                ChronoType chronoType) {
+                                                ChronoType chronoType,
+                                                boolean ruleOfThirds) {
     CameraFragment f=new CameraFragment();
     Bundle args=new Bundle();
 
@@ -122,6 +130,7 @@ public class CameraFragment extends Fragment {
     args.putInt(ARG_DURATION_LIMIT, durationLimit);
     args.putSerializable(ARG_ZOOM_STYLE, zoomStyle);
     args.putBoolean(ARG_FACING_EXACT_MATCH, facingExactMatch);
+    args.putBoolean(ARG_RULE_OF_THIRDS, ruleOfThirds);
 
     if (durationLimit>0 || chronoType!=ChronoType.COUNT_DOWN) {
       args.putSerializable(ARG_CHRONOTYPE, chronoType);
@@ -251,12 +260,12 @@ public class CameraFragment extends Fragment {
     progress=v.findViewById(R.id.cwac_cam2_progress);
     fabPicture=
       (FloatingActionButton)v.findViewById(R.id.cwac_cam2_picture);
+    reverseChronometer=
+      (ReverseChronometer)v.findViewById(R.id.rchrono);
 
     if (isVideo()) {
       fabPicture.setImageResource(R.drawable.cwac_cam2_ic_videocam);
       chronometer=(Chronometer)v.findViewById(R.id.chrono);
-      reverseChronometer=
-        (ReverseChronometer)v.findViewById(R.id.rchrono);
     }
 
     fabPicture.setOnClickListener(new View.OnClickListener() {
@@ -298,7 +307,16 @@ public class CameraFragment extends Fragment {
       prepController();
     }
 
-    return (v);
+    if (showRuleOfThirds()) {
+      v.findViewById(R.id.rule_of_thirds).setVisibility(View.VISIBLE);
+    }
+
+    return(v);
+  }
+
+  @Override
+  public void onCountdownCompleted() {
+    takePicture();
   }
 
   public void shutdown() {
@@ -376,6 +394,16 @@ public class CameraFragment extends Fragment {
       fabSwitch.setEnabled(canSwitchSources());
       fabPicture.setEnabled(true);
       zoomSlider=(SeekBar)getView().findViewById(R.id.cwac_cam2_zoom);
+
+      int timerDuration=getArguments().getInt(ARG_TIMER_DURATION);
+
+      if (timerDuration>0) {
+        reverseChronometer.setVisibility(View.VISIBLE);
+        reverseChronometer.setOverallDuration(timerDuration);
+        reverseChronometer.setListener(this);
+        reverseChronometer.reset();
+        reverseChronometer.run();
+      }
 
       if (ctlr.supportsZoom()) {
         if (getZoomStyle()==ZoomStyle.PINCH) {
@@ -551,12 +579,16 @@ public class CameraFragment extends Fragment {
   }
 
   private boolean canSwitchSources() {
-    return (!getArguments().getBoolean(ARG_FACING_EXACT_MATCH,
+    return(!getArguments().getBoolean(ARG_FACING_EXACT_MATCH,
       false));
   }
 
   private boolean isVideo() {
-    return (getArguments().getBoolean(ARG_IS_VIDEO, false));
+    return(getArguments().getBoolean(ARG_IS_VIDEO, false));
+  }
+
+  private boolean showRuleOfThirds() {
+    return(getArguments().getBoolean(ARG_RULE_OF_THIRDS, false));
   }
 
   private ChronoType getChronoType() {
@@ -602,6 +634,7 @@ public class CameraFragment extends Fragment {
     }
 
     if (reverseChronometer!=null) {
+      reverseChronometer.setListener(null);
       reverseChronometer.stop();
     }
   }
