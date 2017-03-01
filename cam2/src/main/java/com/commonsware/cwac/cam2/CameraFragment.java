@@ -83,6 +83,7 @@ public class CameraFragment extends Fragment
   private SeekBar zoomSlider;
   private Chronometer chronometer;
   private ReverseChronometer reverseChronometer;
+  private ProgressDialog mUserNotification;
 
   public static CameraFragment newPictureInstance(Uri output,
                                                   boolean updateMediaStore,
@@ -497,20 +498,28 @@ public class CameraFragment extends Fragment
           false));
     }
 
-    // Show progress dialog while encrypting & saving image.
-    showUserNotification();
-
     fabPicture.setEnabled(false);
     fabSwitch.setEnabled(false);
     ctlr.takePicture(b.build());
+
+    // Show progress dialog while encrypting & saving image.
+    showUserNotification();
+  }
+
+  @Override
+  public void onDestroyView() {
+    super.onDestroyView();
+    if (mUserNotification != null) {
+      mUserNotification.dismiss();
+    }
   }
 
   private void showUserNotification() {
-    ProgressDialog progressDialog = new ProgressDialog(getActivity());
-    progressDialog.setTitle(getResources().getString(R.string.dialog_title_please_wait));
-    progressDialog.setMessage(getResources().getString(R.string.dialog_message_saving_image));
-    progressDialog.setCancelable(false);
-    progressDialog.show();
+    mUserNotification = new ProgressDialog(getActivity());
+    mUserNotification.setTitle(getResources().getString(R.string.dialog_title_please_wait));
+    mUserNotification.setMessage(getResources().getString(R.string.dialog_message_saving_image));
+    mUserNotification.setCancelable(false);
+    mUserNotification.show();
   }
 
   private void recordVideo() {
