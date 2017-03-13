@@ -15,7 +15,6 @@ import com.commonsware.cwac.cam2.AESCipher;
  */
 
 public class CipherService extends Service {
-    /** Command to the service to display a message */
     public static final int MSG_INIT_CIPHER = 1;
 
     public static final String KEY_ARRAY = "key_array";
@@ -30,7 +29,7 @@ public class CipherService extends Service {
             switch (msg.what) {
                 case MSG_INIT_CIPHER:
                     Bundle bundle = msg.getData();
-                    new AESCipher(bundle.getByteArray(KEY_ARRAY), bundle.getByteArray(IV_ARRAY)).init();
+                    AESCipher.init(bundle.getByteArray(KEY_ARRAY), bundle.getByteArray(IV_ARRAY));
                     break;
                 default:
                     super.handleMessage(msg);

@@ -89,6 +89,7 @@ public class JPEGWriter extends AbstractImageProcessor {
           f.getParentFile().mkdirs();
 
           FileOutputStream fos=new FileOutputStream(f);
+          // Modernizing Medicine - Encrypt before write.
           CipherOutputStream cos = new CipherOutputStream(fos, AESCipher.getCipher());
 
           cos.write(jpeg);

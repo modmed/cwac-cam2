@@ -12,25 +12,15 @@ import javax.crypto.spec.SecretKeySpec;
  * Created by parag.goel on 11/4/16.
  */
 
-public class AESCipher implements Parcelable {
-    private byte[] key;
-    private byte[] iv;
-
+public class AESCipher {
     private static Cipher sAESCipher;
-    public static final Cipher getCipher() {
+    public static Cipher getCipher() {
         return sAESCipher;
     }
 
-    public AESCipher() {
-        // default constructor.
-    }
+    private AESCipher() {}
 
-    public AESCipher(byte[] key, byte[] iv) {
-        this.key = key;
-        this.iv = iv;
-    }
-
-    public void init() {
+    public static synchronized void init(byte[] key, byte[] iv) {
         try {
             sAESCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             SecretKey secretKey = new SecretKeySpec(key, "AES");
@@ -41,36 +31,4 @@ public class AESCipher implements Parcelable {
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByteArray(this.key);
-        dest.writeByteArray(this.iv);
-    }
-
-    public void readFromParcel(Parcel in) {
-        this.key = in.createByteArray();
-        this.iv = in.createByteArray();
-    }
-
-    protected AESCipher(Parcel in) {
-        readFromParcel(in);
-    }
-
-    public static final Creator<AESCipher> CREATOR = new Creator<AESCipher>() {
-        @Override
-        public AESCipher createFromParcel(Parcel source) {
-            return new AESCipher(source);
-        }
-
-        @Override
-        public AESCipher[] newArray(int size) {
-            return new AESCipher[size];
-        }
-    };
 }

@@ -348,13 +348,8 @@ abstract public class CameraEngine {
       useCameraTwo=true;
     }
     else {
-      useCameraTwo=Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP;
-
-      CameraConstraints constraints=CameraConstraints.get();
-
-      if (constraints!=null) {
-        useCameraTwo=useCameraTwo && constraints.supportsCameraTwo();
-      }
+      useCameraTwo=Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP
+              && CameraConstraints.supportsCameraTwo();
     }
 
     if (useCameraTwo) {

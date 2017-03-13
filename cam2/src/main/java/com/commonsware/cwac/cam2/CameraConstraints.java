@@ -275,12 +275,13 @@ public class CameraConstraints {
     return(result);
   }
 
-  public boolean supportsCameraTwo() {
+  public static boolean supportsCameraTwo() {
     if (Build.MANUFACTURER.equals("LGE")) {
       return(false);
     }
 
-    return(supportsCameraTwo);
+    CameraConstraints constraints = CameraConstraints.get();
+    return constraints != null && constraints.supportsCameraTwo;
   }
 
   public int getHighCamcorderProfile() {
